@@ -68,11 +68,6 @@ public class BooksLibrary {
 		return authors;
 	}
 
-	
-//	@Override
-//	public String toString() {
-//		return "BookSearch [title=" + title + ", bookStatus=" + bookStatus + ", result=" + result + "]";
-//	}
 	@Override
 	public String toString() {
 		return "BookSearch [title=" + title + ", bookStatus=" + bookStatus + ", authors=" + authors + ", result=" + result + "]";

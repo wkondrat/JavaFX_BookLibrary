@@ -14,12 +14,10 @@ import com.capgemini.javafx.model.BookStatus;
 import com.capgemini.javafx.model.BooksLibrary;
 
 import javafx.beans.property.ReadOnlyStringWrapper;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -32,45 +30,17 @@ import javafx.scene.control.TextField;
 import javafx.util.Callback;
 import javafx.util.StringConverter;
 
-/**
- * Controller for the LibraryManager screen.
- * <p>
- * The JavaFX runtime will inject corresponding objects in the @FXML annotated
- * fields. The @FXML annotated methods will be called by JavaFX runtime at
- * specific points in time.
- * </p>
- *
- * @author WKONDRAT
- *
- */
+
 public class BooksLibraryController {
 
 	private static final Logger LOG = Logger.getLogger(BooksLibraryController.class);
 
-	/**
-	 * Resource bundle loaded with this controller. JavaFX injects a resource
-	 * bundle specified in {@link FXMLLoader#load(URL, ResourceBundle)} call.
-	 * <p>
-	 * NOTE: The variable name must be {@code resources}.
-	 * </p>
-	 */
 	@FXML
 	private ResourceBundle resources;
 
-	/**
-	 * URL of the loaded FXML file. JavaFX injects an URL specified in
-	 * {@link FXMLLoader#load(URL, ResourceBundle)} call.
-	 * <p>
-	 * NOTE: The variable name must be {@code location}.
-	 * </p>
-	 */
 	@FXML
 	private URL location;
 
-	/**
-	 * JavaFX injects an object defined in FXML with the same "fx:id" as the
-	 * variable name.
-	 */
 	@FXML
 	private TextField titleField;
 	
@@ -82,6 +52,9 @@ public class BooksLibraryController {
 
 	@FXML
 	private Button searchButton;
+	
+	@FXML
+	private Button addButton;
 
 	@FXML
 	private TableView<BookVO> resultTable;
@@ -96,8 +69,6 @@ public class BooksLibraryController {
 	private TableColumn<BookVO, String> authorsColumn;
 
 	private final DataProvider dataProvider = DataProvider.INSTANCE;
-
-//	private final Speaker speaker = Speaker.INSTANCE;
 
 	private final BooksLibrary model = new BooksLibrary();
 	
@@ -132,6 +103,7 @@ public class BooksLibraryController {
 		/*
 		 * Make the Search button inactive when the Name field is empty.
 		 */
+		addButton.disableProperty().bind(titleField.textProperty().isEmpty().or(authorsField.textProperty().isEmpty()).or(bookStatusField.valueProperty().isEqualTo(BookStatus.ANY)));
 		searchButton.disableProperty().bind(titleField.textProperty().isEmpty());
 	}
 
@@ -210,33 +182,6 @@ public class BooksLibraryController {
 		 */
 		resultTable.setPlaceholder(new Label(resources.getString("table.emptyText")));
 
-		/*
-		 * When table's row gets selected say given person's name.
-		 */
-//		resultTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<BookVO>() {
-//
-//			@Override
-//			public void changed(ObservableValue<? extends BookVO> observable, BookVO oldValue, BookVO newValue) {
-//				LOG.debug(newValue + " selected");
-
-//				if (newValue != null) {
-//					Task<Void> backgroundTask = new Task<Void>() {
-//
-//						@Override
-//						protected Void call() throws Exception {
-//							speaker.say(newValue.getName());
-//							return null;
-//						}
-//
-//						@Override
-//						protected void failed() {
-//							LOG.error("Could not say name: " + newValue.getName(), getException());
-//						}
-//					};
-//					new Thread(backgroundTask).start();
-//				}
-//			}
-//		});
 	}
 
 	private String getInternationalizedText(BookStatus bookStatus) {
@@ -262,9 +207,6 @@ public class BooksLibraryController {
 			protected Collection<BookVO> call() throws Exception {
 				LOG.debug("call() called");
 
-				/*
-				 * Get the data.
-				 */
 				Collection<BookVO> result = new ArrayList<BookVO>();
 				try {
 					result = dataProvider.findBooksByParameters(
@@ -272,15 +214,11 @@ public class BooksLibraryController {
 							model.getAuthors(),
 							model.getBookStatus().toBookStatusVO());
 				} catch (Exception e) {
-					LOG.debug("Problem with recieved data");
+					LOG.debug("HTTP GET error");
 				}
 				return result;
 			}
 
-			/**
-			 * This method will be executed in the JavaFX Application Thread
-			 * when the task finishes.
-			 */
 			@Override
 			protected void succeeded() {
 				LOG.debug("succeeded() called");
@@ -301,7 +239,8 @@ public class BooksLibraryController {
 				resultTable.getSortOrder().clear();
 			}
 		};
-
+		
+		
 		/*
 		 * Start the background task. In real life projects some framework
 		 * manages background tasks. You should never create a thread on your
@@ -309,5 +248,46 @@ public class BooksLibraryController {
 		 */
 		new Thread(backgroundTask).start();
 	}
+	
+	@FXML
+	private void addButtonAction(ActionEvent event) {
+		addBookAction(titleField, authorsField, bookStatusField);
+	}
+	
+	private void addBookAction(TextField titleField, TextField authorsField,
+			ComboBox<BookStatus> bookStatusField) {
 
+		Task<Object> backgroundTask = new Task<Object>() {
+
+			@Override
+			protected Object call() throws Exception {
+
+				String title = titleField.getText();
+				String authors = authorsField.getText();
+				BookStatusVO bookStatus = bookStatusField.getValue().toBookStatusVO();
+
+				try {
+					dataProvider.addBook(title, authors, bookStatus);
+				} catch (Exception e) {
+					LOG.debug("HTTP POST error");
+				}
+
+				return new Object();
+			}
+
+			@Override
+			protected void succeeded() {
+				clearFields();
+				LOG.debug("succeeded() called");
+			}
+		};
+
+		new Thread(backgroundTask).start();
+	}
+	
+	private void clearFields() {
+		titleField.clear();
+		authorsField.clear();
+		bookStatusField.setValue(BookStatus.ANY);
+	}
 }

@@ -1,27 +1,23 @@
 package com.capgemini.javafx.dataprovider.data;
 
-/**
- * @author WKONDRAT
- *
- */
 public class BookVO {
 	
 	private Long id;
 	private String title;
 	private String authors;
-	private BookStatusVO bookStatus;
+	private BookStatusVO status;
 	
 	public BookVO(Long id, String title, String authors, BookStatusVO bookStatus) {
 		this.id = id;
 		this.title = title;
 		this.authors = authors;
-		this.bookStatus = bookStatus;
+		this.status = bookStatus;
 	}
 	
 	public BookVO(String title, String authors, BookStatusVO bookStatus) {
 		this.title = title;
 		this.authors = authors;
-		this.bookStatus = bookStatus;
+		this.status = bookStatus;
 	}
 	
 	public Long getId() {
@@ -49,15 +45,15 @@ public class BookVO {
 	}
 	
 	public BookStatusVO getBookStatus() {
-		return bookStatus;
+		return status;
 	}
 	
 	public void setBookStatus(BookStatusVO bookStatus) {
-		this.bookStatus = bookStatus;
+		this.status = bookStatus;
 	}
 	
 	@Override
 	public String toString() {
-		return "Book [title=" + title + ", bookStatus=" + bookStatus + ", authors=" + authors + "]";
+		return "Book [title=" + title + ", bookStatus=" + status + ", authors=" + authors + "]";
 	}
 }

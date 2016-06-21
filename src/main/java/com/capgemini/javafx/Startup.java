@@ -27,13 +27,13 @@ public class Startup extends Application {
 
 		primaryStage.setTitle("StarterKit-JavaFX");
 
-		Parent root = FXMLLoader.load(getClass().getResource("/com/capgemini/javafx/view/library-manager.fxml"), //
+		Parent root = FXMLLoader.load(getClass().getResource("/com/capgemini/javafx/view/library-manager.fxml"), 
 				ResourceBundle.getBundle("com/capgemini/javafx/bundle/base"));
 
 		Scene scene = new Scene(root);
 
 		scene.getStylesheets().add(getClass().getResource("/com/capgemini/javafx/css/standard.css").toExternalForm());
-		// scene.getStylesheets().add(getClass().getResource("/com/capgemini/javafx/css/alternative.css").toExternalForm());
+//		scene.getStylesheets().add(getClass().getResource("/com/capgemini/javafx/css/alternative.css").toExternalForm());
 
 		primaryStage.setScene(scene);
 		

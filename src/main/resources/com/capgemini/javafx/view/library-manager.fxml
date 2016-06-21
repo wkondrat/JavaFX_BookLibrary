@@ -27,6 +27,7 @@
       <Label text="%label.status" GridPane.rowIndex="2" />
       <ComboBox fx:id="bookStatusField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
       <Button fx:id="searchButton" defaultButton="true" mnemonicParsing="false" onAction="#searchButtonAction" text="%button.search" GridPane.rowIndex="3" />
+      <Button fx:id="addButton" mnemonicParsing="false" text="Add Book" onAction="#addButtonAction" GridPane.columnIndex="1" GridPane.rowIndex="3" />
     </children>
   </GridPane>
 	<TableView fx:id="resultTable" layoutX="14.0" layoutY="210.0" prefHeight="176.0" prefWidth="474.0">
