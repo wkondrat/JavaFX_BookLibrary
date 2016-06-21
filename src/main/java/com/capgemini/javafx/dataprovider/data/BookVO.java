@@ -18,6 +18,12 @@ public class BookVO {
 		this.bookStatus = bookStatus;
 	}
 	
+	public BookVO(String title, String authors, BookStatusVO bookStatus) {
+		this.title = title;
+		this.authors = authors;
+		this.bookStatus = bookStatus;
+	}
+	
 	public Long getId() {
 		return id;
 	}

@@ -73,6 +73,9 @@ public class BooksLibraryController {
 	 */
 	@FXML
 	private TextField titleField;
+	
+	@FXML
+	private TextField authorsField;
 
 	@FXML
 	private ComboBox<BookStatus> bookStatusField;
@@ -95,27 +98,15 @@ public class BooksLibraryController {
 	private final DataProvider dataProvider = DataProvider.INSTANCE;
 
 //	private final Speaker speaker = Speaker.INSTANCE;
-//
+
 	private final BooksLibrary model = new BooksLibrary();
-	/**
-	 * The JavaFX runtime instantiates this controller.
-	 * <p>
-	 * The @FXML annotated fields are not yet initialized at this point.
-	 * </p>
-	 */
+	
+
 	public BooksLibraryController() {
 		LOG.debug("Constructor: titleField = " + titleField);
 	}
 
-	/**
-	 * The JavaFX runtime calls this method after loading the FXML file.
-	 * <p>
-	 * The @FXML annotated fields are initialized at this point.
-	 * </p>
-	 * <p>
-	 * NOTE: The method name must be {@code initialize}.
-	 * </p>
-	 */
+
 	@FXML
 	private void initialize() {
 		LOG.debug("initialize(): titleField = " + titleField);
@@ -128,6 +119,7 @@ public class BooksLibraryController {
 		 * Bind controls properties to model properties.
 		 */
 		titleField.textProperty().bindBidirectional(model.titleProperty());
+		authorsField.textProperty().bindBidirectional(model.authorsProperty());
 		bookStatusField.valueProperty().bindBidirectional(model.bookStatusProperty());
 		resultTable.itemsProperty().bind(model.resultProperty());
 
@@ -135,11 +127,7 @@ public class BooksLibraryController {
 		 * Preselect the default value for bookStatus.
 		 */
 		model.setBookStatus(BookStatus.ANY);
-
-		/*
-		 * This works also, because we are using bidirectional binding.
-		 */
-		// bookStatusField.setValue(BookStatus.ANY);
+		model.setAuthors("");
 
 		/*
 		 * Make the Search button inactive when the Name field is empty.
@@ -225,11 +213,11 @@ public class BooksLibraryController {
 		/*
 		 * When table's row gets selected say given person's name.
 		 */
-		resultTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<BookVO>() {
-
-			@Override
-			public void changed(ObservableValue<? extends BookVO> observable, BookVO oldValue, BookVO newValue) {
-				LOG.debug(newValue + " selected");
+//		resultTable.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<BookVO>() {
+//
+//			@Override
+//			public void changed(ObservableValue<? extends BookVO> observable, BookVO oldValue, BookVO newValue) {
+//				LOG.debug(newValue + " selected");
 
 //				if (newValue != null) {
 //					Task<Void> backgroundTask = new Task<Void>() {
@@ -247,28 +235,14 @@ public class BooksLibraryController {
 //					};
 //					new Thread(backgroundTask).start();
 //				}
-			}
-		});
+//			}
+//		});
 	}
 
-	/**
-	 * Gets an internationalized text for given {@link BookStatus} value.
-	 *
-	 * @param bookStatus
-	 *            bookStatus
-	 * @return text
-	 */
 	private String getInternationalizedText(BookStatus bookStatus) {
 		return resources.getString("bookStatus." + bookStatus.name());
 	}
 
-	/**
-	 * The JavaFX runtime calls this method when the <b>Search</b> button is
-	 * clicked.
-	 *
-	 * @param event
-	 *            {@link ActionEvent} holding information about this event
-	 */
 	@FXML
 	private void searchButtonAction(ActionEvent event) {
 		LOG.debug("'Search' button clicked");
@@ -276,13 +250,6 @@ public class BooksLibraryController {
 		searchButtonActionVersion2();	
 	}
 
-	/**
-	 * This implementation is correct.
-	 * <p>
-	 * The {@link DataProvider#findPersons(String, SexVO)} call is executed in a
-	 * background thread.
-	 * </p>
-	 */
 	private void searchButtonActionVersion2() {
 		/*
 		 * Use task to execute the potentially long running call in background
@@ -291,9 +258,6 @@ public class BooksLibraryController {
 		 */
 		Task<Collection<BookVO>> backgroundTask = new Task<Collection<BookVO>>() {
 
-			/**
-			 * This method will be executed in a background thread.
-			 */
 			@Override
 			protected Collection<BookVO> call() throws Exception {
 				LOG.debug("call() called");
@@ -301,14 +265,15 @@ public class BooksLibraryController {
 				/*
 				 * Get the data.
 				 */
-				Collection<BookVO> result = dataProvider.findBooks( //
-						model.getTitle(), //
-						model.getBookStatus().toBookStatusVO());
-
-				/*
-				 * Value returned from this method is stored as a result of task
-				 * execution.
-				 */
+				Collection<BookVO> result = new ArrayList<BookVO>();
+				try {
+					result = dataProvider.findBooksByParameters(
+							model.getTitle(), //
+							model.getAuthors(),
+							model.getBookStatus().toBookStatusVO());
+				} catch (Exception e) {
+					LOG.debug("Problem with recieved data");
+				}
 				return result;
 			}
 

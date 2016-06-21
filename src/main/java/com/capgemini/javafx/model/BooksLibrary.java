@@ -15,6 +15,7 @@ import javafx.collections.FXCollections;
 
 public class BooksLibrary {
 	private final StringProperty title = new SimpleStringProperty();
+	private final StringProperty authors = new SimpleStringProperty();
 	private final ObjectProperty<BookStatus> bookStatus = new SimpleObjectProperty<>();
 	private final ListProperty<BookVO> result = new SimpleListProperty<>(
 			FXCollections.observableList(new ArrayList<>()));
@@ -55,9 +56,25 @@ public class BooksLibrary {
 		return result;
 	}
 
-	@Override
-	public String toString() {
-		return "BookSearch [title=" + title + ", bookStatus=" + bookStatus + ", result=" + result + "]";
+	public final String getAuthors() {
+		return authors.get();
 	}
 
+	public final void setAuthors(String value) {
+		authors.set(value);
+	}
+
+	public StringProperty authorsProperty() {
+		return authors;
+	}
+
+	
+//	@Override
+//	public String toString() {
+//		return "BookSearch [title=" + title + ", bookStatus=" + bookStatus + ", result=" + result + "]";
+//	}
+	@Override
+	public String toString() {
+		return "BookSearch [title=" + title + ", bookStatus=" + bookStatus + ", authors=" + authors + ", result=" + result + "]";
+	}
 }

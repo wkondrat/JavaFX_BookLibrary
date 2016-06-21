@@ -6,10 +6,7 @@ import com.capgemini.javafx.dataprovider.data.BookStatusVO;
 import com.capgemini.javafx.dataprovider.data.BookVO;
 import com.capgemini.javafx.dataprovider.impl.DataProviderImpl;
 
-/**
- * @author WKONDRAT
- *
- */
+
 public interface DataProvider {
 
 	/**
@@ -27,5 +24,5 @@ public interface DataProvider {
 	 *            bookStatus
 	 * @return collection of persons matching the given criteria
 	 */
-	Collection<BookVO> findBooks(String title, BookStatusVO bookStatus);
+	public Collection<BookVO> findBooksByParameters(String title, String authors, BookStatusVO bookStatus) throws Exception;
 }
