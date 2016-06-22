@@ -34,13 +34,13 @@ public class DataProviderImpl implements DataProvider {
 	@Override
 	public Collection<BookVO> findBooksByParameters(String title, String authors, BookStatusVO bookStatus)
 			throws Exception {
-		LOG.debug("Entering findBooks()");
+		LOG.debug("Entering findBooksByParameters()");
 
 		try {
 			books.clear();
 			sendGet(title, authors);
-		} catch (Exception e1) {
-			e1.printStackTrace();
+		} catch (Exception e) {
+			LOG.debug("HTTP GET error");
 		}
 
 		Collection<BookVO> result = books.stream().filter(p -> //
@@ -49,7 +49,7 @@ public class DataProviderImpl implements DataProvider {
 				((bookStatus == null) || (bookStatus != null && p.getBookStatus() == bookStatus)) //
 		).collect(Collectors.toList());
 
-		LOG.debug("Leaving findBooks()");
+		LOG.debug("Leaving findBooksByParameters()");
 		return result;
 	}
 	
@@ -76,6 +76,11 @@ public class DataProviderImpl implements DataProvider {
 		in.close();
 		con.disconnect();
 
+		LOG.debug(response.toString());
+		createListOfReceivedBooks(response);
+	}
+
+	private void createListOfReceivedBooks(StringBuffer response) {
 		JSONArray ja = new JSONArray(response.toString());
 
 		int n = ja.length();
@@ -90,9 +95,6 @@ public class DataProviderImpl implements DataProvider {
 			BookVO c = new BookVO(id2, title2, authors2, status2);
 			books.add(c);
 		}
-
-		LOG.debug(response.toString());
-
 	}
 
 	@Override
@@ -100,10 +102,10 @@ public class DataProviderImpl implements DataProvider {
 		BookVO bookToAdd = new BookVO(null, title, authors, status);
 		
 		LOG.debug("sending = " + toBookJson(bookToAdd));
-		addBook(toBookJson(bookToAdd));
+		sendPost(toBookJson(bookToAdd));
 	}
 	
-	private void addBook(String json) throws Exception {
+	private void sendPost(String json) throws Exception {
 		  
         URL url = new URL("http://localhost:8080/webstore/rest/books");
 
@@ -116,21 +118,18 @@ public class DataProviderImpl implements DataProvider {
         os.write(json.getBytes());
         os.flush();
         
-        if (con.getResponseCode() != HttpURLConnection.HTTP_CREATED) {
-            throw new RuntimeException("Failed : HTTP error code : "
-                + con.getResponseCode());
-        }
+		LOG.debug("Response Code : " + con.getResponseCode());
         
         os.close();
         con.disconnect();
 
     }
 	
-	private static String toBookJson(BookVO book){
-		String jsonBook = "";
+	private static String toBookJson(BookVO bookToParse){
+		String json = "";
 	    Gson gson = new Gson();
 	    Type type = new TypeToken<BookVO>() {}.getType();
-	    jsonBook = gson.toJson(book, type);
-	    return jsonBook;
+	    json = gson.toJson(bookToParse, type);
+	    return json;
 	}
 }
