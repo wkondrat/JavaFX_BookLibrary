@@ -12,6 +12,7 @@
 
 
 /* Select element by its "fx:id" attribute */
+/* REV: nie ma takiego elementu w FXMLu */
 #resultTable #birthDateColumn {
 	-fx-alignment: center-right;
 }

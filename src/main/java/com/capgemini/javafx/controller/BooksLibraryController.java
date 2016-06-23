@@ -213,8 +213,11 @@ public class BooksLibraryController {
 							model.getTitle(), //
 							model.getAuthors(),
 							model.getBookStatus().toBookStatusVO());
+					// REV: lap tylko te wyjatki, ktorych sie spodziewasz
 				} catch (Exception e) {
+					// REV: logowanie bledow na poziomie error
 					LOG.debug("HTTP GET error");
+					// REV: uzytkownik powinien byc poinformowany o bledzie - hint: metoda Task.failed()
 				}
 				return result;
 			}
@@ -262,6 +265,7 @@ public class BooksLibraryController {
 			@Override
 			protected Object call() throws Exception {
 
+				// REV: dane powinny byc pobrane z modelu, a nie z kontrolek
 				String title = titleField.getText();
 				String authors = authorsField.getText();
 				BookStatusVO bookStatus = bookStatusField.getValue().toBookStatusVO();
@@ -269,6 +273,7 @@ public class BooksLibraryController {
 				try {
 					dataProvider.addBook(title, authors, bookStatus);
 				} catch (Exception e) {
+					// REV: j.w.
 					LOG.debug("HTTP POST error");
 				}
 

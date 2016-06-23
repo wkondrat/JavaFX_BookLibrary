@@ -25,6 +25,7 @@ public class DataProviderImpl implements DataProvider {
 
 	private static final Logger LOG = Logger.getLogger(DataProviderImpl.class);
 
+	// REV: wyniki nie powinny przechowywane jak zmienna w klasie
 	private Collection<BookVO> books = new ArrayList<>();
 
 	public DataProviderImpl() {
@@ -33,6 +34,7 @@ public class DataProviderImpl implements DataProvider {
 	
 	@Override
 	public Collection<BookVO> findBooksByParameters(String title, String authors, BookStatusVO bookStatus)
+			// REV: kod ponizej nie rzuca zadnego wyjatku
 			throws Exception {
 		LOG.debug("Entering findBooksByParameters()");
 
@@ -40,9 +42,12 @@ public class DataProviderImpl implements DataProvider {
 			books.clear();
 			sendGet(title, authors);
 		} catch (Exception e) {
+			// REV: bledy nalezy logowac na poziomie error i przekazywac wyjatek do logu
 			LOG.debug("HTTP GET error");
+			// REV: nalezaloby przekazac wyjatek wyzej
 		}
 
+		// REV: po co filtrujesz wyniki? serwer powinien zwrocic tylko ksiazki spelniajace kryteria
 		Collection<BookVO> result = books.stream().filter(p -> //
 		((title == null || title.isEmpty()) || (title != null && !title.isEmpty() && p.getTitle().contains(title))) //
 				&& //
@@ -55,8 +60,10 @@ public class DataProviderImpl implements DataProvider {
 	
 	private void sendGet(String title, String authors) throws Exception {
 
+		// REV: adres serwera powinien byc pobrany z konfiguracji
 		String url = "http://localhost:8080/webstore/rest/search?title="+ title+"&authors=" +authors;
 
+		// REV: lepiej wykorzystac jakas biblioteke do obslugi RESTow niz pisac wszystko samemu
 		URL obj = new URL(url);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
@@ -65,6 +72,7 @@ public class DataProviderImpl implements DataProvider {
 		int responseCode = con.getResponseCode();
 		LOG.debug("\nSending 'GET' request to URL : " + url);
 		LOG.debug("Response Code : " + responseCode);
+		// REV: powinienes sprawdzic jaki response code zwrocil serwer
 
 		BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
 		String inputLine;
@@ -73,6 +81,7 @@ public class DataProviderImpl implements DataProvider {
 		while ((inputLine = in.readLine()) != null) {
 			response.append(inputLine);
 		}
+		// REV: nie zamykasz polaczenia, gdy wystapi wyjatek
 		in.close();
 		con.disconnect();
 
@@ -107,6 +116,7 @@ public class DataProviderImpl implements DataProvider {
 	
 	private void sendPost(String json) throws Exception {
 		  
+		// REV: j.w.
         URL url = new URL("http://localhost:8080/webstore/rest/books");
 
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -119,7 +129,9 @@ public class DataProviderImpl implements DataProvider {
         os.flush();
         
 		LOG.debug("Response Code : " + con.getResponseCode());
+		// REV: j.w.
         
+		// REV: j.w.
         os.close();
         con.disconnect();
 

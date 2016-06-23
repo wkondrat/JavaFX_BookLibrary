@@ -12,6 +12,7 @@
 	</properties>
 
 	<dependencies>
+		<!-- REV: wystarczy jedna biblioteka do obslugi JSONa -->
 		<dependency>
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
